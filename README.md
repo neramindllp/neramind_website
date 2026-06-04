@@ -7,7 +7,7 @@ This project can be hosted directly on **GitHub Pages** because it uses plain HT
 ## Files
 
 - `Neramind_website.html` - main website file
-- `preview (2).html` - alternate working version
+- `Neramind_website.html` - alternate working version
 
 ## Recommended Before Publishing
 
