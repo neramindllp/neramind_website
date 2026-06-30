@@ -1,0 +1,67 @@
+.list { max-width: 760px; margin: 60px auto 0; display: grid; gap: 10px; }
+
+.item {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+  position: relative;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+}
+/* Mouse-track spotlight overlay */
+.item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle 180px at var(--mouse-x) var(--mouse-y), rgba(194,65,12,0.13), transparent 80%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+:global(:root.dark) .item::before {
+  background: radial-gradient(circle 180px at var(--mouse-x) var(--mouse-y), rgba(245,166,35,0.13), transparent 80%);
+}
+.hovered::before { opacity: 1; }
+/* Rotating glow border — idle */
+.item::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: conic-gradient(from var(--border-angle, 0deg), transparent 0deg, var(--accent) 60deg, transparent 120deg, transparent 240deg, var(--accent) 300deg, transparent 360deg);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+  animation: faqBorderRotate 3.5s linear infinite;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  padding: 1px;
+}
+@keyframes faqBorderRotate {
+  from { --border-angle: 0deg; }
+  to   { --border-angle: 360deg; }
+}
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.active { border-color: var(--accent); }
+.active::after { opacity: 0.6; }
+
+/* Content above overlays */
+.q, .a { position: relative; z-index: 1; }
+
+.q { width: 100%; background: none; border: none; padding: 20px 24px; text-align: left; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 1rem; color: var(--text); display: flex; justify-content: space-between; align-items: center; gap: 16px; cursor: pointer; }
+.icon { font-size: 1.2rem; font-weight: 400; color: var(--accent); flex-shrink: 0; transition: transform 0.3s ease; }
+.active .icon { transform: rotate(45deg); }
+.a { max-height: 0; overflow: hidden; transition: max-height 0.42s ease; }
+.active .a { max-height: 320px; }
+.aInner { padding: 0 24px 20px; font-size: 0.95rem; line-height: 1.75; color: var(--muted); }
+.verifyLink { background: none; border: none; color: var(--accent); font-weight: 700; cursor: pointer; font-size: inherit; padding: 0; text-decoration: underline; }

@@ -1,0 +1,129 @@
+/* ── Section shell — GSAP pins this for 400vh ── */
+.section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Sticky header ── */
+.header {
+  width: 100%;
+  padding: 100px 0 60px;
+  flex-shrink: 0;
+}
+
+/* ── Card stack area ── */
+.cardArea {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-bottom: 80px;
+}
+
+/* GSAP animates this wrapper — it owns y, scale, opacity */
+.cardWrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  transform-origin: top center;
+  isolation: isolate;
+  will-change: transform, opacity;
+  /* smooth out the scale-down as cards get buried */
+  transition: box-shadow 0.6s ease;
+}
+
+/* ── Glass card — opaque base so buried cards never show through ── */
+.card {
+  /*
+   * Fully opaque background — no content bleed-through when stacked.
+   * Glass feel comes from the bright border, inset highlight, and
+   * the subtle backdrop-filter which only affects the card's own
+   * surface sheen (not transparency into cards below).
+   */
+  background: #fdf8f5;
+  backdrop-filter: blur(0px) saturate(1.5);
+  -webkit-backdrop-filter: blur(0px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 2px 0  rgba(255, 255, 255, 1) inset,        /* top highlight */
+    0 -1px 0 rgba(0, 0, 0, 0.04)   inset,         /* bottom inner shadow */
+    0 12px 40px rgba(0, 0, 0, 0.07),
+    0 1px  3px  rgba(0, 0, 0, 0.05);
+  padding: 36px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 200px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* smooth transition as cards stack/unstack */
+  transition:
+    box-shadow 0.5s ease,
+    border-color 0.5s ease;
+}
+
+:global(:root.dark) .card {
+  background: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 2px 0  rgba(255, 255, 255, 0.06) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.3)        inset,
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    0 1px  3px  rgba(0, 0, 0, 0.2);
+}
+
+/* ── Card content ── */
+.stepMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.num {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-light);
+  border: 1px solid rgba(194, 65, 12, 0.2);
+  border-radius: 999px;
+  padding: 4px 10px;
+  flex-shrink: 0;
+}
+:global(:root.dark) .num { border-color: rgba(245, 166, 35, 0.2); }
+
+.icon { font-size: 1.5rem; }
+
+.title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.body {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--muted);
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .cardArea { max-width: calc(100% - 40px); }
+  .card { padding: 28px; }
+}
+@media (max-width: 600px) {
+  .header { padding: 80px 0 40px; }
+  .card { min-height: 220px; padding: 24px; }
+}

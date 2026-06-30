@@ -1,0 +1,24 @@
+.wrapper {
+  position: relative;
+  height: 100%;
+  /* No overflow:hidden here — that was clipping card content */
+  border-radius: var(--radius);
+}
+
+/* Content sits above the canvas overlay */
+.content {
+  position: relative;
+  z-index: 2;
+  /* Inherits full dimensions from parent so padding/flex work correctly */
+  height: 100%;
+}
+
+/* Canvas overlay: absolute, behind content (z-index 1), pointer-events none */
+.canvasOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
