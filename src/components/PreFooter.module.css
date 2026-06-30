@@ -1,0 +1,4 @@
+.prefooter { background: var(--accent); padding: 100px 20px; text-align: center; }
+.prefooter h2 { color: #fff; font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 16px; }
+.prefooter p { color: rgba(255,255,255,0.8); font-size: 1.05rem; margin-bottom: 36px; }
+.buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }

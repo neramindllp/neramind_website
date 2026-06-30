@@ -1,0 +1,6 @@
+.backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 36px; max-width: 480px; width: 100%; box-shadow: var(--shadow); position: relative; }
+.box h3 { margin-bottom: 12px; }
+.box p { font-size: 0.95rem; line-height: 1.7; margin-bottom: 16px; }
+.box a { color: var(--accent); font-weight: 700; }
+.close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--muted); position: absolute; top: 16px; right: 20px; line-height: 1; }

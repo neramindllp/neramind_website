@@ -1,0 +1,7 @@
+.footer { height: 64px; background: var(--bg); border-top: 1px solid var(--line); display: flex; align-items: center; }
+.inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; font-size: var(--font-small); color: var(--muted); font-family: Inter, sans-serif; width: 100%; }
+.divider { flex: 1; height: 1px; background: var(--line); margin: 0 16px; }
+.links { display: flex; gap: 20px; align-items: center; }
+.links a:hover { color: var(--accent); }
+.verifyBtn { background: none; border: none; color: var(--muted); font: inherit; cursor: pointer; padding: 0; }
+.verifyBtn:hover { color: var(--accent); }

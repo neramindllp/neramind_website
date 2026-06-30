@@ -1,0 +1,87 @@
+.card-spotlight {
+  position: relative;
+  border-radius: var(--radius, 20px);
+  overflow: hidden;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-color: rgba(194, 65, 12, 0.14);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* flat — no preserve-3d, prevents back-face flash */
+  transform-style: flat;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* ── Radial spotlight (mouse-tracked) ── */
+.card-spotlight__spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle 240px at var(--mouse-x) var(--mouse-y),
+    var(--spotlight-color),
+    transparent 80%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.card-spotlight:hover .card-spotlight__spotlight {
+  opacity: 1;
+}
+
+/* ── Content sits above both overlays ── */
+.card-spotlight__content {
+  position: relative;
+  z-index: 2;
+  /* inherit all display from the card's own class */
+  display: contents;
+}
+
+/* Rotating glow border */
+.card-spotlight::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 0deg,
+    var(--accent, #C2410C) 60deg,
+    transparent 120deg,
+    transparent 240deg,
+    var(--accent, #C2410C) 300deg,
+    transparent 360deg
+  );
+  opacity: 0.35;
+  pointer-events: none;
+  animation: borderRotate 3s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) padding-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask:
+    linear-gradient(#fff 0 0) padding-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  padding: 1.5px;
+  transition: opacity 0.3s ease;
+}
+
+.card-spotlight:hover::after {
+  opacity: 0.65;
+}
+
+@keyframes borderRotate {
+  from { --border-angle: 0deg; }
+  to   { --border-angle: 360deg; }
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
