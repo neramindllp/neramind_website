@@ -27,7 +27,7 @@ export default function CtaBand({
         variants={staggerContainer}
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
+        viewport={{ once: true, amount: 0.15 }}
         className="relative overflow-hidden rounded-3xl glass gradient-border px-8 py-14 text-center md:px-14 md:py-20"
       >
         <div

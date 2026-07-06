@@ -2,10 +2,16 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useMotionTemplate,
+  useReducedMotion,
+} from "framer-motion";
 import { ArrowUpRight, Check } from "lucide-react";
+import { fadeUp, staggerContainer } from "@/lib/animations";
 import MockDashboard from "./mock/MockDashboard";
 
 // Generic capability copy — describes what a CRM/ERP does, no invented stats.
@@ -43,154 +49,164 @@ const PRODUCTS = [
   },
 ];
 
-export default function ProductShowcase() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const slidesRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
-  const barRef = useRef<HTMLDivElement>(null);
+const SPRING = { stiffness: 150, damping: 20, mass: 0.5 };
 
-  useGSAP(
-    () => {
-      const section = sectionRef.current;
-      const wrap = slidesRef.current;
-      if (!section || !wrap) return;
+/**
+ * One product panel: 3D cursor tilt + a spotlight glow that tracks the pointer
+ * + flex-grow expansion on hover (the sibling yields). All cursor work runs on
+ * motion values — zero React re-renders per mousemove. Touch and
+ * reduced-motion users get the static card.
+ */
+function ProductPanel({ product: p }: { product: (typeof PRODUCTS)[number] }) {
+  const reduced = useReducedMotion();
+  const cardRef = useRef<HTMLDivElement>(null);
 
-      gsap.registerPlugin(ScrollTrigger);
-      const mm = gsap.matchMedia();
+  // Pointer position within the card, as percentages (50/50 = centered).
+  const px = useMotionValue(50);
+  const py = useMotionValue(50);
 
-      // Only pin + crossfade on desktop with motion allowed. Mobile and
-      // reduced-motion users get the accessible stacked layout (rendered by
-      // default markup below).
-      mm.add(
-        "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
-        () => {
-          const slides = gsap.utils.toArray<HTMLElement>(".ps-slide", wrap);
-          const labels = gsap.utils.toArray<HTMLElement>(".ps-label", section);
-          const bar = barRef.current;
-          if (slides.length < 2 || !bar) return;
+  // Tilt a few degrees toward the cursor, spring-damped.
+  const rotateX = useSpring(useTransform(py, [0, 100], [5, -5]), SPRING);
+  const rotateY = useSpring(useTransform(px, [0, 100], [-6, 6]), SPRING);
 
-          // Switch from stacked flow into an overlapping stack.
-          gsap.set(wrap, { position: "relative" });
-          gsap.set(slides, { position: "absolute", inset: 0 });
-          gsap.set(slides[0], { autoAlpha: 1, xPercent: 0 });
-          gsap.set(slides[1], { autoAlpha: 0, xPercent: 6 });
-          gsap.set(labels[0], { opacity: 1 });
-          gsap.set(labels[1], { opacity: 0.4 });
-          gsap.set(bar, { scaleX: 0 });
-          gsap.set(progressRef.current, { autoAlpha: 1 });
+  // Spotlight that follows the cursor inside the panel.
+  const spotlight = useMotionTemplate`radial-gradient(560px circle at ${px}% ${py}%, var(--accent-glow), transparent 45%)`;
 
-          const tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              end: "+=220%",
-              pin: true,
-              scrub: 1,
-              anticipatePin: 1,
-            },
-          });
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (reduced || e.pointerType !== "mouse") return;
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    px.set(((e.clientX - rect.left) / rect.width) * 100);
+    py.set(((e.clientY - rect.top) / rect.height) * 100);
+  };
 
-          // Hold on CRM while the bar advances to the midpoint.
-          tl.to(bar, { scaleX: 0.5, ease: "none", duration: 1 }, 0);
-          // Crossfade CRM -> ERP.
-          tl.to(slides[0], { autoAlpha: 0, xPercent: -6, duration: 1 }, 1);
-          tl.to(slides[1], { autoAlpha: 1, xPercent: 0, duration: 1 }, 1);
-          tl.to(labels[0], { opacity: 0.4, duration: 1 }, 1);
-          tl.to(labels[1], { opacity: 1, duration: 1 }, 1);
-          tl.to(bar, { scaleX: 1, ease: "none", duration: 1 }, 1);
-          // Brief hold on ERP before release.
-          tl.to({}, { duration: 0.5 });
-        }
-      );
-
-      return () => mm.revert();
-    },
-    { scope: sectionRef }
-  );
+  const onPointerLeave = () => {
+    px.set(50);
+    py.set(50);
+  };
 
   return (
-    <section
-      id="products"
-      ref={sectionRef}
-      className="relative overflow-hidden py-24 md:py-0"
+    <motion.article
+      variants={fadeUp}
+      className="group flex-1 transition-[flex-grow] duration-700 ease-out lg:hover:grow-[1.35]"
     >
-      <div ref={slidesRef} className="relative md:min-h-[100svh]">
-        {PRODUCTS.map((p) => (
-          <article
-            key={p.id}
-            className="ps-slide flex items-center md:min-h-[100svh]"
-          >
-            <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-6 py-16 md:py-0 lg:grid-cols-2 lg:gap-16">
-              {/* Copy column */}
-              <div>
-                <p className="eyebrow mb-4">Our Products — {p.index} / 02</p>
-                <h2 className="font-display text-[clamp(2rem,5vw,3.5rem)] font-semibold leading-tight tracking-tight text-ink">
-                  {p.name}
-                </h2>
-                <p className="mt-2 font-display text-lg text-accent-2">
-                  {p.tagline}
-                </p>
-                <p className="mt-5 max-w-md leading-relaxed text-muted">
-                  {p.desc}
-                </p>
-                <ul className="mt-7 grid max-w-md grid-cols-1 gap-3 sm:grid-cols-2">
-                  {p.features.map((f) => (
-                    <li
-                      key={f}
-                      className="flex items-center gap-2.5 text-sm text-muted"
-                    >
-                      <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-accent/15 text-accent-2">
-                        <Check className="h-3 w-3" aria-hidden />
-                      </span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={p.href}
-                  className="group mt-8 inline-flex items-center gap-2 font-display text-sm text-ink"
-                >
-                  <span className="border-b border-transparent pb-0.5 transition-colors group-hover:border-white/40">
-                    Explore {p.name}
-                  </span>
-                  <ArrowUpRight
-                    className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                    aria-hidden
-                  />
-                </Link>
-              </div>
-
-              {/* Mock dashboard in a perspective-tilted frame */}
-              <div className="[perspective:1400px]">
-                <div className="transition-transform duration-500 ease-out [transform:rotateX(6deg)_rotateY(-8deg)] hover:[transform:rotateX(2deg)_rotateY(-3deg)]">
-                  <MockDashboard variant={p.variant} />
-                </div>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      {/* Scroll progress (shown only in pinned/enhanced mode) */}
       <div
-        ref={progressRef}
-        className="pointer-events-none absolute inset-x-0 bottom-8 z-20 opacity-0"
+        ref={cardRef}
+        onPointerMove={onPointerMove}
+        onPointerLeave={onPointerLeave}
+        className="h-full [perspective:1600px]"
       >
-        <div className="mx-auto flex max-w-7xl items-center gap-4 px-6">
-          <span className="ps-label whitespace-nowrap font-display text-xs uppercase tracking-eyebrow text-ink">
-            01 · CRM
-          </span>
-          <div className="relative h-px flex-1 bg-white/15">
-            <div
-              ref={barRef}
-              className="absolute inset-y-0 left-0 w-full origin-left scale-x-0 bg-accent-gradient"
-            />
+        <motion.div
+          style={reduced ? undefined : { rotateX, rotateY }}
+          className="relative flex h-full flex-col overflow-hidden rounded-3xl glass gradient-border p-7 will-change-transform sm:p-9"
+        >
+          {/* Cursor spotlight (desktop hover only). */}
+          <motion.div
+            aria-hidden
+            style={{ background: spotlight }}
+            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          />
+
+          {/* Header */}
+          <div className="relative flex items-baseline justify-between gap-4">
+            <div>
+              <h3 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+                {p.name}
+              </h3>
+              <p className="mt-1 font-display text-sm text-accent-2 sm:text-[1rem]">
+                {p.tagline}
+              </p>
+            </div>
+            <span className="font-display text-5xl font-semibold leading-none text-white/[0.07] sm:text-6xl">
+              {p.index}
+            </span>
           </div>
-          <span className="ps-label whitespace-nowrap font-display text-xs uppercase tracking-eyebrow text-faint">
-            02 · ERP
-          </span>
-        </div>
+
+          {/* Dashboard mock — floats up + flattens slightly on hover. */}
+          <div className="relative mt-7 [perspective:1200px]">
+            <div className="transition-transform duration-500 ease-out [transform:rotateX(8deg)] group-hover:-translate-y-1.5 group-hover:[transform:rotateX(3deg)]">
+              <MockDashboard variant={p.variant} />
+            </div>
+          </div>
+
+          {/* Copy */}
+          <p className="relative mt-7 max-w-md leading-relaxed text-muted">
+            {p.desc}
+          </p>
+          <ul className="relative mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {p.features.map((f) => (
+              <li
+                key={f}
+                className="flex items-center gap-2.5 text-sm text-muted"
+              >
+                <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-accent/15 text-accent-2">
+                  <Check className="h-3 w-3" aria-hidden />
+                </span>
+                {f}
+              </li>
+            ))}
+          </ul>
+
+          <div className="relative mt-auto pt-8">
+            <Link
+              href={p.href}
+              className="group/link inline-flex min-h-[44px] items-center gap-2 font-display text-sm text-ink"
+            >
+              <span className="border-b border-transparent pb-0.5 transition-colors group-hover/link:border-white/40">
+                Explore {p.name}
+              </span>
+              <ArrowUpRight
+                className="h-4 w-4 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5"
+                aria-hidden
+              />
+            </Link>
+          </div>
+        </motion.div>
       </div>
+    </motion.article>
+  );
+}
+
+/**
+ * Dual-flagship showcase. No pinning, no scroll hijacking — the page keeps
+ * scrolling naturally. The immersion comes from the cursor instead: 3D tilt,
+ * tracked spotlight, and the hovered product expanding while its sibling
+ * yields. Mobile / touch / reduced-motion: clean stacked cards.
+ */
+export default function ProductShowcase() {
+  return (
+    <section id="products" className="relative overflow-hidden py-24 md:py-36">
+      {/* Ambient divider glow behind the two panels. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[70vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle_at_center,var(--accent-glow),transparent_60%)] blur-3xl"
+      />
+
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.15 }}
+        className="mx-auto max-w-7xl px-6"
+      >
+        <motion.header variants={fadeUp} className="max-w-3xl">
+          <p className="eyebrow mb-4">Our Products</p>
+          <h2 className="font-display text-[clamp(1.8rem,4vw,3.5rem)] font-semibold leading-tight tracking-tight text-ink">
+            Two flagships. <span className="text-gradient">One platform.</span>
+          </h2>
+          <p className="mt-4 max-w-xl leading-relaxed text-muted">
+            Purpose-built systems for the two sides of every growing business —
+            the relationships that bring revenue in, and the operations that
+            keep it running.
+          </p>
+        </motion.header>
+
+        <div className="mt-12 flex flex-col gap-6 lg:flex-row lg:items-stretch">
+          {PRODUCTS.map((p) => (
+            <ProductPanel key={p.id} product={p} />
+          ))}
+        </div>
+      </motion.div>
     </section>
   );
 }

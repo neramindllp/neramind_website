@@ -18,7 +18,7 @@ export default function FeatureGrid({
       <motion.h2
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, amount: 0.6 }}
+        viewport={{ once: true, amount: 0.2 }}
         variants={fadeUp}
         className="max-w-2xl font-display text-[clamp(1.6rem,3.5vw,2.75rem)] font-semibold leading-tight tracking-tight text-ink"
       >
@@ -41,7 +41,7 @@ export default function FeatureGrid({
                   <span className="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-accent/15 text-accent-2 ring-1 ring-inset ring-white/10">
                     <Icon className="h-5 w-5" aria-hidden />
                   </span>
-                  <h3 className="font-display text-base font-medium text-ink">
+                  <h3 className="font-display text-[1rem] font-medium text-ink">
                     {item.title}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted">

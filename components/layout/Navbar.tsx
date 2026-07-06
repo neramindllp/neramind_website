@@ -55,7 +55,10 @@ export default function Navbar() {
             priority
             className="h-8 w-auto"
           />
-          NERA<span className="text-gradient">MIND</span>
+          {/* Single span so the flex gap can't split the word apart. */}
+          <span>
+            NERA<span className="text-gradient">MIND</span>
+          </span>
         </Link>
 
         {/* Centered links only appear once there's genuinely room (lg+), so the
