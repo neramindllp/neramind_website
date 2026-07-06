@@ -37,8 +37,13 @@ export default function HeroVideo() {
     let hls: import("hls.js").default | null = null;
     let cancelled = false;
 
+    // Reveal as soon as the video has real pixels to show. We listen on
+    // several events (not just `playing`) because a decoded-but-paused frame
+    // is still better than the bare gradient, and autoplay can be deferred.
     const onReady = () => setReady(true);
-    video.addEventListener("playing", onReady);
+    ["playing", "canplay", "loadeddata"].forEach((ev) =>
+      video.addEventListener(ev, onReady)
+    );
 
     // Autoplay is only permitted for muted inline video — enforce in JS too.
     video.muted = true;
@@ -62,6 +67,21 @@ export default function HeroVideo() {
           hls.loadSource(HLS_SRC);
           hls.attachMedia(video);
           hls.on(Hls.Events.MANIFEST_PARSED, tryPlay);
+
+          // Without this, a single transient error on load leaves the video
+          // silently hidden forever (the "gone on reload" symptom). Recover
+          // from fatal network/media errors instead of giving up.
+          hls.on(Hls.Events.ERROR, (_evt, data) => {
+            if (!data.fatal || !hls) return;
+            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+              hls.startLoad();
+            } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+              hls.recoverMediaError();
+            } else {
+              hls.destroy();
+              hls = null;
+            }
+          });
         } else {
           // Last-resort: let the browser attempt the source directly.
           video.src = HLS_SRC;
@@ -72,7 +92,9 @@ export default function HeroVideo() {
 
     return () => {
       cancelled = true;
-      video.removeEventListener("playing", onReady);
+      ["playing", "canplay", "loadeddata"].forEach((ev) =>
+        video.removeEventListener(ev, onReady)
+      );
       video.removeEventListener("loadedmetadata", tryPlay);
       if (hls) hls.destroy();
     };

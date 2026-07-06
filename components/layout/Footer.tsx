@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Linkedin, Twitter, Instagram, Github, MapPin } from "lucide-react";
+import { Linkedin, Instagram, MapPin } from "lucide-react";
 
 // Full site navigation — every pillar is represented here, none dropped.
 const NAV_GROUPS = [
@@ -28,12 +28,10 @@ const NAV_GROUPS = [
   },
 ];
 
-// [COPY: replace with real social URLs, email and phone]
+// [COPY: replace LinkedIn placeholder with the real company profile URL]
 const SOCIALS = [
-  { label: "LinkedIn", href: "#", icon: Linkedin },
-  { label: "X (Twitter)", href: "#", icon: Twitter },
-  { label: "Instagram", href: "#", icon: Instagram },
-  { label: "GitHub", href: "#", icon: Github },
+  { label: "Instagram", href: "https://www.instagram.com/neramind_llp/", icon: Instagram },
+  { label: "LinkedIn", href: "https://www.linkedin.com", icon: Linkedin },
 ];
 
 export default function Footer() {
@@ -65,6 +63,8 @@ export default function Footer() {
                   <a
                     key={s.label}
                     href={s.href}
+                    target="_blank"
+                    rel="noreferrer"
                     aria-label={s.label}
                     className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-muted transition-colors hover:border-white/25 hover:text-ink"
                   >
