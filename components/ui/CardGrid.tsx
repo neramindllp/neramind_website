@@ -31,7 +31,7 @@ export default function CardGrid({
         variants={staggerContainer}
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
+        viewport={{ once: true, amount: 0.15 }}
         className="max-w-2xl"
       >
         <motion.p variants={fadeUp} className="eyebrow mb-4">

@@ -31,7 +31,7 @@ export default function ClosingCTA() {
         variants={staggerContainer}
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
+        viewport={{ once: true, amount: 0.15 }}
         className="mx-auto max-w-3xl px-6 text-center"
       >
         <motion.p variants={fadeUp} className="eyebrow mb-5">

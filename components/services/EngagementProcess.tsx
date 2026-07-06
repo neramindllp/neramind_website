@@ -21,7 +21,7 @@ export default function EngagementProcess({
         variants={staggerContainer}
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, amount: 0.5 }}
+        viewport={{ once: true, amount: 0.15 }}
         className="max-w-2xl"
       >
         <motion.p variants={fadeUp} className="eyebrow mb-4">
@@ -59,7 +59,7 @@ export default function EngagementProcess({
                   {s.step}
                 </span>
               </div>
-              <h3 className="mt-5 font-display text-base font-medium text-ink">
+              <h3 className="mt-5 font-display text-[1rem] font-medium text-ink">
                 {s.title}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">

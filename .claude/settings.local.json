@@ -11,7 +11,22 @@
       "Bash(curl -s -m 15 \"https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8\")",
       "Bash(curl -s -m 20 -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3001/)",
       "Bash(taskkill //F //IM node.exe //FI \"WINDOWTITLE eq *\")",
-      "Bash(pkill -f \"next dev\")"
+      "Bash(pkill -f \"next dev\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const b=fs.readFileSync\\('public/neramind_logo.png'\\);console.log\\('w',b.readUInt32BE\\(16\\),'h',b.readUInt32BE\\(20\\)\\);\")",
+      "Bash(npx next *)",
+      "Bash(npx tsc *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" \"https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8\")",
+      "Bash(curl -s \"https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8\")",
+      "Bash(find . -path ./node_modules -prune -o \\\\\\( -iname \"*.mp4\" -o -iname \"*.webm\" -o -iname \"*.mov\" -o -iname \"*.m3u8\" \\\\\\) -print)",
+      "Bash(ls -la public)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(curl -s -o /dev/null -w \"localhost:3000 -> %{http_code}\\\\n\" http://localhost:3000)",
+      "Bash(grep -rl \"@react-three/fiber\\\\|@react-three/drei\\\\|from \\\\\"three\\\\\"\\\\|from 'three'\" --include=*.tsx --include=*.ts app components lib)",
+      "Bash(grep -rln \"next/dynamic\" --include=*.tsx app components)",
+      "Bash(grep -rln \"lenis\\\\|Lenis\\\\|ScrollTrigger\\\\|useScroll\\\\|scrollY\\\\|IntersectionObserver\" --include=*.tsx --include=*.ts app components lib)",
+      "Skill(claude-in-chrome)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} in %{time_total}s\\\\n\" --max-time 60 http://localhost:3000)"
     ]
   }
 }

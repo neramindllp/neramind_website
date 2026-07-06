@@ -25,7 +25,7 @@ export default function AIServices() {
         variants={staggerContainer}
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
+        viewport={{ once: true, amount: 0.15 }}
         className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
       >
         <div className="max-w-2xl">

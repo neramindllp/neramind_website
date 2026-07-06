@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { EASE } from "@/lib/animations";
@@ -44,9 +45,20 @@ export default function Navbar() {
       >
         <Link
           href="/"
-          className="shrink-0 font-display text-lg font-semibold tracking-tight text-ink"
+          className="flex shrink-0 items-center gap-2 font-display text-lg font-semibold tracking-tight text-ink"
         >
-          NERA<span className="text-gradient">MIND</span>
+          <Image
+            src="/neramind_logo.png"
+            alt="Neramind LLP logo"
+            width={567}
+            height={440}
+            priority
+            className="h-8 w-auto"
+          />
+          {/* Single span so the flex gap can't split the word apart. */}
+          <span>
+            NERA<span className="text-gradient">MIND</span>
+          </span>
         </Link>
 
         {/* Centered links only appear once there's genuinely room (lg+), so the

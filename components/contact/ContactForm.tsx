@@ -21,18 +21,32 @@ const field =
 const labelCls =
   "mb-2 block font-display text-xs uppercase tracking-eyebrow text-muted";
 
-export default function ContactForm() {
-  const [status, setStatus] = useState<"idle" | "submitting" | "success">(
-    "idle"
-  );
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xojbgwpn";
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+export default function ContactForm() {
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // NOTE: no backend is wired yet — this only simulates a successful send so
-    // the UX is complete. [COPY: POST these fields to a real endpoint / email
-    // service (e.g. Resend, Formspree, or an API route) before going live.]
+    const form = e.currentTarget;
     setStatus("submitting");
-    setTimeout(() => setStatus("success"), 900);
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(form),
+      });
+      if (res.ok) {
+        setStatus("success");
+        form.reset();
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
   };
 
   if (status === "success") {
@@ -169,7 +183,13 @@ export default function ContactForm() {
         className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
       >
         <p className="max-w-xs text-xs leading-relaxed text-faint">
-          By sending this, you agree to be contacted about your enquiry.
+          {status === "error" ? (
+            <span role="alert" className="text-red-400">
+              Something went wrong. Please try again or email us directly.
+            </span>
+          ) : (
+            "By sending this, you agree to be contacted about your enquiry."
+          )}
         </p>
         <button
           type="submit"

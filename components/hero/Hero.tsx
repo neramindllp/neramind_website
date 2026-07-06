@@ -1,15 +1,42 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import { EASE } from "@/lib/animations";
 import AnimatedHeadline from "@/components/ui/AnimatedHeadline";
 import MagneticButton from "@/components/ui/MagneticButton";
 import HeroVideo from "./HeroVideo";
+import HeroLogo from "./HeroLogo";
 
 export default function Hero() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Scroll-linked exit: as the hero scrolls away, the copy drifts up and
+  // fades while the logo floats up faster and shrinks slightly — the page
+  // responds to the very first centimeter of scroll. Spring-smoothed so it
+  // feels damped, not glued to the wheel. (MotionConfig reducedMotion="user"
+  // strips these transforms for reduced-motion users automatically.)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const progress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 28,
+    mass: 0.4,
+  });
+  const copyY = useTransform(progress, [0, 1], [0, -110]);
+  const copyOpacity = useTransform(progress, [0, 0.55], [1, 0]);
+  const logoY = useTransform(progress, [0, 1], [0, -190]);
+  const logoScale = useTransform(progress, [0, 1], [1, 0.88]);
+  const logoOpacity = useTransform(progress, [0, 0.7], [1, 0]);
+
   return (
-    <section className="relative flex min-h-[100svh] items-center overflow-hidden">
+    <section
+      ref={sectionRef}
+      className="relative flex min-h-[100svh] items-center overflow-hidden"
+    >
       {/* Layer 1: full-viewport HLS background video (with CSS gradient mesh
           underneath as poster / reduced-motion fallback). */}
       <div className="absolute inset-0 z-0">
@@ -23,8 +50,21 @@ export default function Hero() {
       <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(ellipse_at_center,transparent_40%,var(--bg)_92%)]" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-40 bg-gradient-to-t from-base to-transparent" />
 
+      {/* Layer 2.5: interactive 3D particle logo in the otherwise-empty right
+          column. Desktop only, sits above the scrims but below (and never
+          blocks) the content. */}
+      <motion.div
+        style={{ y: logoY, scale: logoScale, opacity: logoOpacity }}
+        className="pointer-events-none absolute right-0 top-0 z-[15] hidden h-full w-[46%] items-center pr-6 lg:flex"
+      >
+        <HeroLogo />
+      </motion.div>
+
       {/* Layer 3: content. */}
-      <div className="relative z-20 mx-auto w-full max-w-7xl px-6">
+      <motion.div
+        style={{ y: copyY, opacity: copyOpacity }}
+        className="relative z-20 mx-auto w-full max-w-7xl px-6"
+      >
         <div className="max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -50,7 +90,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: EASE, delay: 0.7 }}
-            className="mt-7 max-w-xl text-base leading-relaxed text-muted md:text-lg"
+            className="mt-7 max-w-xl text-[1rem] leading-relaxed text-muted md:text-lg"
           >
             From <span className="text-ink">education consultation</span> and
             career-defining bootcamps to{" "}
@@ -69,7 +109,7 @@ export default function Hero() {
             </MagneticButton>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Scroll hint. */}
       <motion.div

@@ -58,7 +58,7 @@ export default function EducationConsultation() {
           variants={staggerContainer}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.4 }}
+          viewport={{ once: true, amount: 0.15 }}
           className="lg:sticky lg:top-32 lg:self-start"
         >
           <motion.p variants={fadeUp} className="eyebrow mb-4">

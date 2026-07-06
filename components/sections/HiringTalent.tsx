@@ -127,7 +127,7 @@ export default function HiringTalent() {
                     <Icon className="h-5 w-5" aria-hidden />
                   </span>
                   <div>
-                    <h3 className="font-display text-base font-medium text-ink">
+                    <h3 className="font-display text-[1rem] font-medium text-ink">
                       {v.title}
                     </h3>
                     <p className="mt-1 text-sm leading-relaxed text-muted">
