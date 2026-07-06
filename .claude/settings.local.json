@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(tasklist //FI \"IMAGENAME eq node.exe\")",
+      "Bash(rm -rf .next)",
+      "Bash(ls -d .next)",
+      "Bash(netstat -ano)",
+      "Bash(curl -s -m 15 \"https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8\")",
+      "Bash(curl -s -m 20 -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3001/)",
+      "Bash(taskkill //F //IM node.exe //FI \"WINDOWTITLE eq *\")",
+      "Bash(pkill -f \"next dev\")"
+    ]
+  }
+}
