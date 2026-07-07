@@ -38,9 +38,9 @@ export default function HeroLogo() {
     // This effect runs at hydration — the same moment the headline animation
     // gets scheduled — so "now + HEADLINE_DONE_MS" is when the text is done.
     revealAtRef.current = performance.now() + HEADLINE_DONE_MS;
-    // Particle assembly parked for now (not rendering reliably on target
-    // machines — revisit with live browser debugging). Static logo until then.
-    setMode("static");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const desktop = window.matchMedia("(min-width: 1024px)").matches;
+    setMode(!reduce && desktop ? "particles" : "static");
   }, []);
 
   return (

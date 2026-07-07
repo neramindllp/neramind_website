@@ -115,6 +115,7 @@ const VERTEX = /* glsl */ `
     float sizeF = (0.35 + 0.65 * rs) * (1.0 + 0.35 * sin(rs * 3.14159));
     gl_PointSize = uSize * uScale * uPixelRatio * (1.0 / -mvPosition.z) * sizeF;
 
+
     // Fade in early in the flight so pieces are visible while traveling,
     // then hold at full alpha forever once assembled.
     vAlpha = smoothstep(0.02, 0.3, r);
@@ -148,17 +149,34 @@ function ParticleField({
   const viewport = useThree((s) => s.viewport);
   const groupRef = useRef<THREE.Group>(null);
 
-  const uniforms = useMemo(
-    () => ({
-      uReveal: { value: 0 },
-      uTime: { value: 0 },
-      uSize: { value: 6 },
-      uScale: { value: 1 },
-      uPixelRatio: { value: 1 },
-      uMouse: { value: new THREE.Vector2(0, 0) },
-    }),
+  // Build the material imperatively and attach it with <primitive> below.
+  // Passing a `uniforms` object as a JSX prop lets R3F's prop-diffing detach
+  // it from the live material — our useFrame mutations then update a dead
+  // object and every uniform stays at its initial value (size ~0.4px, alpha
+  // 0 → the "invisible particles" bug). With the material owned by us, the
+  // object we mutate IS the one on the GPU.
+  const material = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: {
+          uReveal: { value: 0 },
+          uTime: { value: 0 },
+          uSize: { value: 6 },
+          uScale: { value: 1 },
+          uPixelRatio: { value: 1 },
+          uMouse: { value: new THREE.Vector2(0, 0) },
+        },
+        vertexShader: VERTEX,
+        fragmentShader: FRAGMENT,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.NormalBlending,
+      }),
     []
   );
+  const uniforms = material.uniforms;
+
+  useEffect(() => () => material.dispose(), [material]);
 
   useEffect(() => {
     uniforms.uPixelRatio.value = gl.getPixelRatio();
@@ -226,14 +244,7 @@ function ParticleField({
   return (
     <group ref={groupRef} scale={scale}>
       <points geometry={geometry} frustumCulled={false}>
-        <shaderMaterial
-          uniforms={uniforms}
-          vertexShader={VERTEX}
-          fragmentShader={FRAGMENT}
-          transparent
-          depthWrite={false}
-          blending={THREE.NormalBlending}
-        />
+        <primitive object={material} attach="material" />
       </points>
     </group>
   );
